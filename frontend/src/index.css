@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+:root {
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+}
+
+:focus {
+  @apply outline-primary;
+  @apply outline-2;
+  @apply rounded-sm;
+  @apply outline-dashed;
+}
