@@ -8,9 +8,16 @@ body,
   scroll-behavior: smooth;
 }
 
+/*
 :focus {
   @apply outline-primary;
   @apply outline-2;
   @apply rounded-sm;
   @apply outline-dashed;
+}
+*/
+
+:focus,
+:focus-visible {
+  @apply rounded-sm outline-none ring-2 ring-offset-2;
 }

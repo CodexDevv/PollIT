@@ -10,6 +10,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  refreshtoken: {
+    type: String,
+    required: false,
+  },
 });
 
 const userCollection = new mongoose.model("userCollection", userSchema);

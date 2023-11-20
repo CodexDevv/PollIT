@@ -10,7 +10,7 @@ const db = require("./database");
 const userCollection = require("./model/Users");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 const {
   createAccessToken,
@@ -60,7 +60,12 @@ app.post("/login", async (req, res) => {
     const accesstoken = createAccessToken(user.id);
     const refreshtoken = createRefreshToken(user.id);
 
-    user.refreshtoken = refreshtoken;
+    userCollection.findOneAndUpdate(
+      { email: email },
+      { refreshtoken: refreshtoken }
+    );
+
+    // user.refreshtoken = refreshtoken;
 
     sendRefreshToken(res, refreshtoken);
     sendAccessToken(res, req, accesstoken);
@@ -96,7 +101,11 @@ app.post("/refresh_token", (req, res) => {
   const accesstoken = createAccessToken(user.id);
   const refreshtoken = createRefreshToken(user.id);
 
-  user.refreshtoken = refreshtoken;
+  userCollection.findOneAndUpdate(
+    { email: email },
+    { refreshtoken: refreshtoken }
+  );
+
   sendRefreshToken(res, refreshtoken);
   return res.send({ accesstoken });
 });
