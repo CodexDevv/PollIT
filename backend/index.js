@@ -18,8 +18,9 @@ const {
   sendRefreshToken,
   sendAccessToken,
 } = require("./tokens.js");
+const { get } = require("mongoose");
 
-const checkAuth = require("./checkAuth.js");
+// const checkAuth = require("./checkAuth.js");
 
 app.use(cookieParser());
 app.use(
@@ -40,7 +41,11 @@ app.post("/register", async (req, res) => {
     if (user) throw new Error("User already exists");
 
     const hashedPassword = await hash(password, 10);
-    await userCollection.create({ email: email, password: hashedPassword });
+    await userCollection.create({
+      email: email,
+      password: hashedPassword,
+      refreshtoken: "",
+    });
     res.status(201).send({ message: "User created" });
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -60,12 +65,10 @@ app.post("/login", async (req, res) => {
     const accesstoken = createAccessToken(user.id);
     const refreshtoken = createRefreshToken(user.id);
 
-    userCollection.findOneAndUpdate(
+    await userCollection.findOneAndUpdate(
       { email: email },
       { refreshtoken: refreshtoken }
     );
-
-    // user.refreshtoken = refreshtoken;
 
     sendRefreshToken(res, refreshtoken);
     sendAccessToken(res, req, accesstoken);
@@ -81,33 +84,39 @@ app.post("/logout", (req, res) => {
   });
 });
 
-app.post("/refresh_token", (req, res) => {
+app.post("/refresh_token", async (req, res) => {
   const token = req.cookies.refreshtoken;
-  if (!token) return res.send({ accesstoken: "" });
-
-  let payload = null;
-
   try {
-    payload = verify(token, process.env.REFRESH_TOKEN_SECRET);
+    if (!token) return res.send({ accesstoken: "" });
+
+    let payload = null;
+
+    try {
+      payload = verify(token, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return res.send({ accesstoken: "" });
+    }
+
+    // TODO: ca la login/register
+    const user = await userCollection.findOne({ _id: payload.userId });
+
+    if (!user) return res.send({ accesstoken: "" });
+
+    if (user.refreshtoken !== token) return res.send({ accesstoken: "" });
+
+    const accesstoken = createAccessToken(user.id);
+    const refreshtoken = createRefreshToken(user.id);
+
+    await userCollection.findOneAndUpdate(
+      { email: user.email },
+      { refreshtoken: refreshtoken }
+    );
+
+    sendRefreshToken(res, refreshtoken);
+    return res.send({ accesstoken });
   } catch (err) {
-    return res.send({ accesstoken: "" });
+    res.status(500).send({ message: err.message });
   }
-
-  const user = userCollection.findOne({ id: payload.userId });
-  if (!user) return res.send({ accesstoken: "" });
-
-  if (user.refreshtoken !== token) return res.send({ accesstoken: "" });
-
-  const accesstoken = createAccessToken(user.id);
-  const refreshtoken = createRefreshToken(user.id);
-
-  userCollection.findOneAndUpdate(
-    { email: email },
-    { refreshtoken: refreshtoken }
-  );
-
-  sendRefreshToken(res, refreshtoken);
-  return res.send({ accesstoken });
 });
 
 app.get("/", (req, res) => {

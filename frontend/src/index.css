@@ -6,6 +6,7 @@ body,
 :root {
   font-family: 'Inter', sans-serif;
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
 /*
@@ -17,7 +18,9 @@ body,
 }
 */
 
-:focus,
+/*:focus,
 :focus-visible {
   @apply rounded-sm outline-none ring-2 ring-offset-2;
+  @apply outline-none;
 }
+*/

@@ -1,17 +1,19 @@
 import { FaBars, FaPlus, FaXmark } from 'react-icons/fa6';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { UserContext } from '../App';
 
 import Logo from '../assets/logo.svg';
 const Navbar = () => {
+  const [user, setUser] = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(false);
-
-  const isAuth = true;
 
   const [isLoginOpen, setLoginOpen] = useState(false);
   const [isRegisterOpen, setRegisterOpen] = useState(false);
   const [isPostOpen, setPostOpen] = useState(false);
+
+  const [isAuth, setIsAuth] = useState(user.accesstoken !== '');
 
   const {
     register,
@@ -20,9 +22,67 @@ const Navbar = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = data => {
-    console.log(data);
+  const onSubmitRegister = data => {
+    async function doRegister() {
+      const res = await (
+        await fetch('http://localhost:5000/register', {
+          method: 'POST',
+          credentials: 'include',
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      ).json();
+      if (!res.error) {
+        // TODO: maybe display a toast message
+        window.location.reload();
+      } else {
+        console.error(res.error);
+      }
+    }
+    doRegister();
   };
+
+  const onSubmitLogin = data => {
+    async function doLogin() {
+      const res = await (
+        await fetch('http://localhost:5000/login', {
+          method: 'POST',
+          credentials: 'include',
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      ).json();
+      if (res.accesstoken) {
+        window.location.reload();
+      } else {
+        console.error(res.error);
+      }
+    }
+    doLogin();
+  };
+
+  const logoutCallback = async () => {
+    await fetch('http://localhost:5000/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+    setUser({});
+    window.location.reload();
+  };
+
+  useEffect(() => {
+    setIsAuth(user.accesstoken !== '');
+  }, [user]);
 
   return (
     <nav className="relative flex items-center justify-between bg-white p-4 shadow-lg">
@@ -53,7 +113,10 @@ const Navbar = () => {
           >
             Post
           </button>
-          <button className="text-lg font-medium text-secondary hover:text-secondary/80">
+          <button
+            onClick={logoutCallback}
+            className="text-lg font-medium text-secondary hover:text-secondary/80"
+          >
             Log Out
           </button>
         </div>
@@ -97,7 +160,10 @@ const Navbar = () => {
           >
             Post
           </button>
-          <button className="text-lg font-medium text-secondary hover:text-secondary/80">
+          <button
+            onClick={logoutCallback}
+            className="text-lg font-medium text-secondary hover:text-secondary/80"
+          >
             Log Out
           </button>
         </div>
@@ -146,7 +212,7 @@ const Navbar = () => {
                   <form
                     className="flex flex-col gap-8"
                     autoComplete="off"
-                    onSubmit={e => e.preventDefault()}
+                    onSubmit={handleSubmit(onSubmitLogin)}
                   >
                     <div className="flex flex-col gap-2">
                       <input
@@ -184,8 +250,7 @@ const Navbar = () => {
                     <input
                       type="submit"
                       value="Login"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-blue-900 outline-none hover:cursor-pointer hover:bg-gray-100 focus:ring-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-                      onClick={handleSubmit(onSubmit)}
+                      className="inline-flex justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-blue-900 hover:cursor-pointer hover:bg-gray-100 disabled:opacity-50"
                     />
                   </form>
                 </Dialog.Panel>
@@ -238,7 +303,7 @@ const Navbar = () => {
                   <form
                     className="flex flex-col gap-8"
                     autoComplete="off"
-                    onSubmit={e => e.preventDefault()}
+                    onSubmit={handleSubmit(onSubmitRegister)}
                   >
                     <div className="flex flex-col gap-2">
                       <input
@@ -273,30 +338,35 @@ const Navbar = () => {
                       />
                       {errors.password && <p>{errors.password.message}</p>}
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <input
-                        type="password"
-                        className="appearance-none rounded-lg bg-transparent p-2 ring-2 ring-white  focus:ring-2 focus:ring-primary"
-                        placeholder="Confirm Password"
-                        {...register('cpassword', {
-                          required: 'You must confirm the password!',
-                          validate: {
-                            matchesPreviousPassword: value => {
-                              const { password } = getValues();
-                              return (
-                                password === value || 'Passwords should match!'
-                              );
+                    {isRegisterOpen && (
+                      <div className="flex flex-col gap-2">
+                        <input
+                          type="password"
+                          className="appearance-none rounded-lg bg-transparent p-2 ring-2 ring-white  focus:ring-2 focus:ring-primary"
+                          placeholder="Confirm Password"
+                          {...register('cpassword', {
+                            required:
+                              isRegisterOpen &&
+                              'You must confirm the password!',
+                            validate: {
+                              matchesPreviousPassword: value => {
+                                const { password } = getValues();
+                                return (
+                                  password === value ||
+                                  'Passwords should match!'
+                                );
+                              },
                             },
-                          },
-                        })}
-                      />
-                      {errors.cpassword && <p>{errors.cpassword.message}</p>}
-                    </div>
+                          })}
+                        />
+                        {errors.cpassword && <p>{errors.cpassword.message}</p>}
+                      </div>
+                    )}
+
                     <input
                       type="submit"
                       value="Create Account"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-blue-900 hover:cursor-pointer hover:bg-gray-100  disabled:opacity-50"
-                      onClick={handleSubmit(onSubmit)}
+                      className="inline-flex justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-blue-900 hover:cursor-pointer hover:bg-gray-100 disabled:opacity-50"
                     />
                   </form>
                 </Dialog.Panel>
@@ -324,7 +394,7 @@ const Navbar = () => {
             <div className="fixed inset-0 bg-white/50" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
+          <div className="fixed inset-0 overflow-hidden">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
               <Transition.Child
                 as={Fragment}
@@ -335,7 +405,7 @@ const Navbar = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="flex w-full max-w-md transform flex-col overflow-hidden rounded-md bg-secondary p-6 text-left align-middle text-white shadow-xl transition-all">
+                <Dialog.Panel className="flex w-full max-w-lg transform flex-col overflow-hidden rounded-md bg-secondary p-6 text-left align-middle text-white shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="mb-8 flex items-center justify-between text-center text-3xl font-semibold leading-6"
@@ -360,8 +430,29 @@ const Navbar = () => {
                         placeholder="Type your question here"
                       />
                     </div>
-                    <div>
-                      <p>Voting Type</p>
+                    <div className="flex flex-col gap-4">
+                      <p className="-mb-2">Voting Type</p>
+                      <label className="flex items-center gap-2">
+                        <input
+                          className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600"
+                          id="single"
+                          type="radio"
+                          name="votingtype"
+                          value="single"
+                          defaultChecked
+                        />
+                        Single Choice
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600"
+                          id="multiple"
+                          type="radio"
+                          name="votingtype"
+                          value="multiple"
+                        />
+                        Multiple Choice
+                      </label>
                     </div>
                     <div className="flex flex-col gap-4">
                       <p className="-mb-2">Answer Options</p>
@@ -381,7 +472,7 @@ const Navbar = () => {
                         placeholder="Option 3"
                       />
 
-                      <button className="flex w-1/2 items-center justify-center gap-2 rounded-md border border-transparent bg-white/50 px-4 py-2 text-sm font-medium text-white hover:cursor-pointer hover:bg-white/40 focus:rounded-md ">
+                      <button className="flex w-1/3 items-center justify-center gap-2 rounded-md border border-transparent bg-white/50 px-4 py-2 text-sm font-medium text-white hover:cursor-pointer hover:bg-white/40 focus:rounded-md ">
                         <FaPlus />
                         <span>Add option</span>
                       </button>
