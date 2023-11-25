@@ -6,8 +6,9 @@ const { hash, compare } = require("bcryptjs");
 const { verify } = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 
-const db = require("./database");
+const db = require("./database.js");
 const userCollection = require("./model/Users");
+const pollCollection = require("./model/Poll");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -18,9 +19,9 @@ const {
   sendRefreshToken,
   sendAccessToken,
 } = require("./tokens.js");
-const { get } = require("mongoose");
 
-// const checkAuth = require("./checkAuth.js");
+const isAuth = require("./isAuth.js");
+let ObjectId = require("mongodb").ObjectId;
 
 app.use(cookieParser());
 app.use(
@@ -97,7 +98,6 @@ app.post("/refresh_token", async (req, res) => {
       return res.send({ accesstoken: "" });
     }
 
-    // TODO: ca la login/register
     const user = await userCollection.findOne({ _id: payload.userId });
 
     if (!user) return res.send({ accesstoken: "" });
@@ -116,6 +116,113 @@ app.post("/refresh_token", async (req, res) => {
     return res.send({ accesstoken });
   } catch (err) {
     res.status(500).send({ message: err.message });
+  }
+});
+
+// CRUD FOR POSTS
+
+// example for post:
+// title: "Title",
+// pollType: "Single" / "Multiple",
+// options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+// votes: [{email: "email@domain", option: 0}, {email: "email@domain", option: 1}],
+// creator: "email@domain.com"
+
+app.post("/create_post", async (req, res) => {
+  const { question, options, pollType, email } = req.body;
+
+  try {
+    const userId = isAuth(req);
+    if (userId !== null) {
+      await pollCollection.create({
+        question: question,
+        pollType: pollType,
+        options: options,
+        votes: [],
+        creator: email,
+      });
+      res.status(201).send({ message: "Post created" });
+    }
+  } catch (err) {
+    res.status(500).send({
+      error: `${err.message}`,
+    });
+  }
+});
+
+app.get("/get_posts", async (req, res) => {
+  try {
+    const posts = await pollCollection.find();
+    res.status(200).send(posts);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+});
+
+app.post("/vote_post", async (req, res) => {
+  const { id, option, email } = req.body;
+
+  let o_id = new ObjectId(id);
+
+  try {
+    const userId = isAuth(req);
+    if (userId !== null) {
+      const selectedPoll = await pollCollection.findOne({ _id: o_id });
+      if (!selectedPoll) throw new Error("Poll does not exist");
+
+      const optionIndex = selectedPoll.options.indexOf(option);
+
+      if (selectedPoll.votes.some((vote) => vote.email === email))
+        throw new Error("You already voted");
+
+      const arr = { email: email, option: optionIndex };
+
+      try {
+        await pollCollection.findOneAndUpdate(
+          { _id: o_id },
+          { $push: { votes: arr } }
+        );
+        res.send({ message: "Voted" });
+      } catch (err) {
+        res.send({
+          error: `${err.message}`,
+        });
+      }
+    }
+  } catch (err) {
+    res.send({
+      error: `${err.message}`,
+    });
+  }
+});
+
+app.post("/delete_post", async (req, res) => {
+  const { id } = req.body;
+
+  var o_id = new ObjectId(id);
+
+  try {
+    const userId = isAuth(req);
+    if (userId !== null) {
+      try {
+        const selectedPoll = await pollCollection.findOne({ _id: o_id });
+        if (!selectedPoll) throw new Error("Poll does not exist");
+        const user = await userCollection.findOne({ _id: userId });
+        if (selectedPoll.creator !== user.email)
+          throw new Error("You are not the creator");
+
+        await pollCollection.findOneAndDelete({ _id: o_id });
+        res.send({ message: "Deleted" });
+      } catch (err) {
+        res.send({
+          error: `${err.message}`,
+        });
+      }
+    }
+  } catch (err) {
+    res.send({
+      error: `${err.message}`,
+    });
   }
 });
 
