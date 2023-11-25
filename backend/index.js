@@ -113,7 +113,7 @@ app.post("/refresh_token", async (req, res) => {
     );
 
     sendRefreshToken(res, refreshtoken);
-    return res.send({ accesstoken });
+    return res.send({ accesstoken: accesstoken, email: user.email });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -122,13 +122,13 @@ app.post("/refresh_token", async (req, res) => {
 // CRUD FOR POSTS
 
 // example for post:
-// title: "Title",
+// question: "Question",
 // pollType: "Single" / "Multiple",
 // options: ["Option 1", "Option 2", "Option 3", "Option 4"],
 // votes: [{email: "email@domain", option: 0}, {email: "email@domain", option: 1}],
 // creator: "email@domain.com"
 
-app.post("/create_post", async (req, res) => {
+app.post("/create_poll", async (req, res) => {
   const { question, options, pollType, email } = req.body;
 
   try {
@@ -150,7 +150,7 @@ app.post("/create_post", async (req, res) => {
   }
 });
 
-app.get("/get_posts", async (req, res) => {
+app.get("/get_polls", async (req, res) => {
   try {
     const posts = await pollCollection.find();
     res.status(200).send(posts);
@@ -159,7 +159,7 @@ app.get("/get_posts", async (req, res) => {
   }
 });
 
-app.post("/vote_post", async (req, res) => {
+app.post("/vote_poll", async (req, res) => {
   const { id, option, email } = req.body;
 
   let o_id = new ObjectId(id);
@@ -196,7 +196,7 @@ app.post("/vote_post", async (req, res) => {
   }
 });
 
-app.post("/delete_post", async (req, res) => {
+app.post("/delete_poll", async (req, res) => {
   const { id } = req.body;
 
   var o_id = new ObjectId(id);

@@ -19,9 +19,12 @@ const sendAccessToken = (res, req, accesstoken) => {
 };
 
 const sendRefreshToken = (res, refreshtoken) => {
+  let oneWeek = 7 * 24 * 3600 * 1000;
   res.cookie("refreshtoken", refreshtoken, {
     httpOnly: true,
     path: "/refresh_token",
+    expires: new Date(Date.now() + oneWeek),
+    maxAge: oneWeek,
   });
 };
 

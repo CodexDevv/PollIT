@@ -1,9 +1,25 @@
 // import Testoasa from '../assets/testoasa.svg';
+import { useEffect, useState } from 'react';
 import Testoasa from '../assets/OBJECTS.png';
 import PollCard from '../components/PollCard';
 import PollCardMultiple from '../components/PollCardMultiple';
 
 const Home = () => {
+  const [polls, setPolls] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchPolls = async () => {
+      const res = await (await fetch('http://localhost:5000/get_polls')).json();
+      setPolls(res);
+      setLoading(false);
+    };
+    fetchPolls();
+  }, []);
+
+  // console.log(polls);
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className="flex flex-col gap-4 p-2 pt-16 sm:py-4 lg:gap-16 xl:py-4">
       <div className="flex items-center justify-between">
@@ -16,19 +32,15 @@ const Home = () => {
           <img src={Testoasa} alt="Testoasa" className="lg:w-[24rem]" />
         </div>
       </div>
-      <div className="flex flex-col gap-4 md:gap-8 lg:gap-16">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:gap-16">
-          <PollCard />
-          <PollCard />
-          <PollCard />
-          <PollCard />
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:gap-16">
-          <PollCardMultiple />
-          <PollCardMultiple />
-          <PollCardMultiple />
-          <PollCardMultiple />
-        </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:gap-16">
+        {polls.map(poll => {
+          if (poll.pollType === 'single') {
+            return <PollCard key={poll._id} data={poll} />;
+          } else {
+            return <PollCardMultiple key={poll._id} data={poll} />;
+          }
+        })}
       </div>
     </div>
   );

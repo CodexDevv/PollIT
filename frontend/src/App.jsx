@@ -26,6 +26,7 @@ function App() {
       ).json();
       setUser({
         accesstoken: res.accesstoken,
+        email: res.email,
       });
       setLoading(false);
     }
