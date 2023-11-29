@@ -40,6 +40,7 @@ app.post("/register", async (req, res) => {
   try {
     const user = await userCollection.findOne({ email: email });
     if (user) throw new Error("User already exists");
+    // if (user) res.status(409).send("User Already Exists. Please Login!");
 
     const hashedPassword = await hash(password, 10);
     await userCollection.create({

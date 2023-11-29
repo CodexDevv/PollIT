@@ -1,5 +1,7 @@
 import { useState, useEffect, createContext } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -37,6 +39,18 @@ function App() {
 
   return (
     <UserContext.Provider value={[user, setUser]}>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="flex min-h-[100dvh] flex-col justify-between space-y-4 bg-it bg-cover bg-no-repeat">
         <Navbar />
         <Routes>
@@ -47,6 +61,7 @@ function App() {
         </Routes>
         <Footer />
       </div>
+      <ToastContainer />
     </UserContext.Provider>
   );
 }

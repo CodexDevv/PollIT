@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Fragment, useContext } from 'react';
 import { UserContext } from '../App';
+import { toast } from 'react-toastify';
 
 const PollCard = ({ data }) => {
   const uuid = () => Math.random().toString(36).slice(-10);
@@ -33,7 +34,15 @@ const PollCard = ({ data }) => {
       ).json();
       if (res.error) console.log(res.error);
       else {
-        alert('Voted!');
+        toast.success('Successfully voted!', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
       }
     };
     doVote();
@@ -56,8 +65,15 @@ const PollCard = ({ data }) => {
       ).json();
       if (res.error) console.log(res.error);
       else {
-        alert('Deleted!');
-        window.location.reload();
+        toast.info('Deleted!', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
       }
     };
     doDelete();

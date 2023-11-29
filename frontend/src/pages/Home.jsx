@@ -1,4 +1,3 @@
-// import Testoasa from '../assets/testoasa.svg';
 import { useEffect, useState } from 'react';
 import Testoasa from '../assets/OBJECTS.png';
 import PollCard from '../components/PollCard';

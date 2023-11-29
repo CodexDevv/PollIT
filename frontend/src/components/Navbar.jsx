@@ -1,4 +1,5 @@
 import { FaBars, FaPlus, FaXmark } from 'react-icons/fa6';
+import { toast } from 'react-toastify';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -16,11 +17,10 @@ const Navbar = () => {
 
   const [isAuth, setIsAuth] = useState(user.accesstoken !== '');
 
-  const [numInputs, setNumInputs] = useState(1);
-
   const {
     register,
     handleSubmit,
+    resetField,
     getValues,
     control,
     formState: { errors },
@@ -30,6 +30,18 @@ const Navbar = () => {
     control,
     name: 'options',
   });
+
+  const [options, setOptions] = useState([0]);
+
+  const handleAddOption = () => {
+    setOptions([...options, options.length + 1]);
+  };
+
+  const handleDeleteOption = id => {
+    const newOptions = options.filter(option => option !== id);
+    resetField(`options.${id}`);
+    setOptions(newOptions);
+  };
 
   const onSubmitRegister = data => {
     async function doRegister() {
@@ -47,10 +59,28 @@ const Navbar = () => {
         })
       ).json();
       if (!res.error) {
-        // TODO: maybe display a toast message
-        window.location.reload();
+        // window.location.reload();
+        toast.success('Account created!', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
+        setRegisterOpen(false);
       } else {
         console.error(res.error);
+        toast.error(JSON.stringify(res.error).replaceAll('"', ''), {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
       }
     }
     doRegister();
@@ -76,9 +106,28 @@ const Navbar = () => {
           accesstoken: res.accesstoken,
           email: res.email,
         });
-        window.location.reload();
+        setLoginOpen(false);
+        toast.success('Logged in!', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
+        // window.location.reload();
       } else {
-        console.error(res.error);
+        console.error(res.message);
+        toast.error(JSON.stringify(res.message).replaceAll('"', ''), {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
       }
     }
     doLogin();
@@ -95,6 +144,7 @@ const Navbar = () => {
 
   const createPoll = data => {
     async function doCreatePoll() {
+      let newOptions = options.map(option => data.options[option]);
       const res = await (
         await fetch('http://localhost:5000/create_poll', {
           method: 'POST',
@@ -102,7 +152,7 @@ const Navbar = () => {
           body: JSON.stringify({
             question: data.question,
             pollType: data.votingtype,
-            options: data.options,
+            options: newOptions,
             email: user.email,
           }),
           headers: {
@@ -114,10 +164,28 @@ const Navbar = () => {
 
       if (res.error) {
         console.error(res.error);
+        toast.error(JSON.stringify(res.error).replaceAll('"', ''), {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'light',
+        });
       } else {
         setPostOpen(false);
-        // TODO: ADD TOAST
-        alert('Post created!');
+        // window.location.reload();
+        toast.success('Post created!', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
       }
     }
     doCreatePoll();
@@ -444,7 +512,7 @@ const Navbar = () => {
               <div className="fixed inset-0 bg-white/50" />
             </Transition.Child>
 
-            <div className="fixed inset-0 overflow-hidden">
+            <div className="fixed inset-0 overflow-y-scroll">
               <div className="flex min-h-full items-center justify-center p-4 text-center">
                 <Transition.Child
                   as={Fragment}
@@ -510,22 +578,34 @@ const Navbar = () => {
                       {/* TODO: Add option to remove option */}
                       <div className="flex flex-col gap-4">
                         <p className="-mb-2">Answer Options</p>
-                        {[...Array(numInputs)].map((_, i) => (
-                          <input
+                        {options.map((option, i) => (
+                          <div
                             key={i}
-                            type="text"
-                            className="w-full rounded rounded-t-none border-t-4 border-primary bg-white/40 p-2 text-white placeholder-white/80 outline-none transition-all focus:border-primary focus:ring-0"
-                            placeholder={`Option ${i + 1}`}
-                            {...register(`options.${i}`)}
-                          />
+                            className="flex w-full items-center justify-between rounded rounded-t-none border-t-4 border-primary bg-white/40 p-2 text-white outline-none transition-all focus:border-primary focus:ring-0"
+                          >
+                            <input
+                              type="text"
+                              className="w-full border-none bg-transparent placeholder-white/80 outline-none"
+                              placeholder={`Option ${i + 1}`}
+                              {...register(`options.${option}`)}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteOption(option)}
+                              disabled={options.length == 1}
+                            >
+                              <FaXmark />
+                            </button>
+                          </div>
                         ))}
 
                         <button
                           onClick={e => {
                             e.preventDefault();
-                            setNumInputs(numInputs + 1);
+                            handleAddOption();
                           }}
-                          className="flex w-1/3 items-center justify-center gap-2 rounded-md border border-transparent bg-white/50 px-4 py-2 text-sm font-medium text-white hover:cursor-pointer hover:bg-white/40 focus:rounded-md "
+                          disabled={options.length == 8}
+                          className="flex w-1/3 items-center justify-center gap-2 rounded-md border border-transparent bg-white/50 px-4 py-2 text-sm font-medium text-white hover:cursor-pointer hover:bg-white/40 focus:rounded-md disabled:opacity-50"
                         >
                           <FaPlus />
                           <span>Add option</span>
@@ -537,7 +617,6 @@ const Navbar = () => {
                       >
                         Create Poll
                       </button>
-                      {/* {JSON.stringify(errors)} */}
                     </form>
                   </Dialog.Panel>
                 </Transition.Child>
