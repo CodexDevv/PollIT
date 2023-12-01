@@ -35,13 +35,14 @@ const PollCard = ({ data }) => {
       if (res.error) console.log(res.error);
       else {
         toast.success('Successfully voted!', {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           theme: 'light',
+          toastId: 'success-vote',
         });
       }
     };
@@ -66,13 +67,14 @@ const PollCard = ({ data }) => {
       if (res.error) console.log(res.error);
       else {
         toast.info('Deleted!', {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           theme: 'light',
+          toastId: 'success-delete',
         });
       }
     };

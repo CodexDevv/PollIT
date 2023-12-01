@@ -2,11 +2,13 @@
 import { FaPlus, FaXmark } from 'react-icons/fa6';
 import { toast } from 'react-toastify';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { UserContext } from '../../App';
 
 const CreateModal = ({ isPostOpen, setPostOpen }) => {
   const { register, handleSubmit, resetField, control } = useForm();
+  const [user] = useContext(UserContext);
 
   useFieldArray({
     control,
@@ -48,7 +50,7 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
       if (res.error) {
         console.error(res.error);
         toast.error(JSON.stringify(res.error).replaceAll('"', ''), {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -60,7 +62,7 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
         setPostOpen(false);
         // window.location.reload();
         toast.success('Post created!', {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -68,6 +70,7 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
           draggable: true,
           progress: undefined,
           theme: 'light',
+          toastId: 'success-create',
         });
       }
     }

@@ -30,6 +30,7 @@ const LoginModal = ({ isLoginOpen, setLoginOpen }) => {
           },
         })
       ).json();
+
       if (res.accesstoken) {
         setUser({
           accesstoken: res.accesstoken,
@@ -37,25 +38,27 @@ const LoginModal = ({ isLoginOpen, setLoginOpen }) => {
         });
         setLoginOpen(false);
         toast.success('Logged in!', {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           theme: 'light',
+          toastId: 'success-login',
         });
         // window.location.reload();
       } else {
         console.error(res.message);
         toast.error(JSON.stringify(res.message).replaceAll('"', ''), {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           theme: 'light',
+          toastId: 'error-login',
         });
       }
     }

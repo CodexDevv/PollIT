@@ -31,25 +31,27 @@ const RegisterModal = ({ isRegisterOpen, setRegisterOpen }) => {
       if (!res.error) {
         // window.location.reload();
         toast.success('Account created!', {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           theme: 'light',
+          toastId: 'success-register',
         });
         setRegisterOpen(false);
       } else {
         console.error(res.error);
         toast.error(JSON.stringify(res.error).replaceAll('"', ''), {
-          position: 'top-right',
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           theme: 'light',
+          toastId: 'error-register',
         });
       }
     }

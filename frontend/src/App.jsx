@@ -40,9 +40,9 @@ function App() {
   return (
     <UserContext.Provider value={[user, setUser]}>
       <ToastContainer
-        position="top-right"
+        position="bottom-right"
         autoClose={5000}
-        hideProgressBar={false}
+        hideProgressBar
         newestOnTop={false}
         closeOnClick
         rtl={false}
