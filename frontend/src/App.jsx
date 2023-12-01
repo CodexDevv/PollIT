@@ -10,10 +10,13 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 
 export const UserContext = createContext([]);
+export const PollsContext = createContext([]);
 
 function App() {
   const [user, setUser] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [polls, setPolls] = useState([]);
+  const [loadingToken, setLoadingToken] = useState(true);
+  const [loadingPolls, setLoadingPolls] = useState(true);
 
   useEffect(() => {
     async function checkRefreshToken() {
@@ -30,39 +33,52 @@ function App() {
         accesstoken: res.accesstoken,
         email: res.email,
       });
-      setLoading(false);
+      setLoadingToken(false);
     }
     checkRefreshToken();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  const fetchPolls = async () => {
+    setLoadingPolls(true);
+    const res = await (await fetch('http://localhost:5000/get_polls')).json();
+    setPolls(res);
+    setLoadingPolls(false);
+  };
+
+  useEffect(() => {
+    fetchPolls();
+  }, []);
+
+  if (loadingPolls || loadingToken) return <div>Loading...</div>;
 
   return (
-    <UserContext.Provider value={[user, setUser]}>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <div className="flex min-h-[100dvh] flex-col justify-between space-y-4 bg-it bg-cover bg-no-repeat">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="*" element={<Home />} />
-          </Route>
-        </Routes>
-        <Footer />
-      </div>
-      <ToastContainer />
-    </UserContext.Provider>
+    <PollsContext.Provider value={{ polls, setPolls, fetchPolls }}>
+      <UserContext.Provider value={{ user, setUser }}>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        <div className="flex min-h-[100dvh] flex-col justify-between space-y-4 bg-it bg-cover bg-no-repeat">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="*" element={<Home />} />
+            </Route>
+          </Routes>
+          <Footer />
+        </div>
+        <ToastContainer />
+      </UserContext.Provider>
+    </PollsContext.Provider>
   );
 }
 

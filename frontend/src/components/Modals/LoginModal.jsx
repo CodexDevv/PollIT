@@ -4,10 +4,11 @@ import { toast } from 'react-toastify';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useContext } from 'react';
 import { useForm } from 'react-hook-form';
-import { UserContext } from '../../App';
+import { UserContext, PollsContext } from '../../App';
 
 const LoginModal = ({ isLoginOpen, setLoginOpen }) => {
-  const [setUser] = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
+  const { fetchPolls } = useContext(PollsContext);
 
   const {
     register,
@@ -47,6 +48,7 @@ const LoginModal = ({ isLoginOpen, setLoginOpen }) => {
           theme: 'light',
           toastId: 'success-login',
         });
+        fetchPolls();
         // window.location.reload();
       } else {
         console.error(res.message);

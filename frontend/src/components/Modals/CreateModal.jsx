@@ -4,18 +4,19 @@ import { toast } from 'react-toastify';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useContext, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { UserContext } from '../../App';
+import { UserContext, PollsContext } from '../../App';
 
 const CreateModal = ({ isPostOpen, setPostOpen }) => {
   const { register, handleSubmit, resetField, control } = useForm();
-  const [user] = useContext(UserContext);
+  const { user } = useContext(UserContext);
+  const { fetchPolls } = useContext(PollsContext);
 
   useFieldArray({
     control,
     name: 'options',
   });
 
-  const [options, setOptions] = useState([0]);
+  const [options, setOptions] = useState([0, 1]);
 
   const handleAddOption = () => {
     setOptions([...options, options.length + 1]);
@@ -72,6 +73,7 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
           theme: 'light',
           toastId: 'success-create',
         });
+        fetchPolls();
       }
     }
     doCreatePoll();
@@ -159,7 +161,6 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
                       Multiple Choice
                     </label>
                   </div>
-                  {/* TODO: Add option to remove option */}
                   <div className="flex flex-col gap-4">
                     <p className="-mb-2">Answer Options</p>
                     {options.map((option, i) => (
@@ -176,7 +177,7 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
                         <button
                           type="button"
                           onClick={() => handleDeleteOption(option)}
-                          disabled={options.length == 1}
+                          disabled={options.length <= 2}
                         >
                           <FaXmark />
                         </button>

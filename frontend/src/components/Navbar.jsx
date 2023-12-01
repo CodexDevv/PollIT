@@ -8,7 +8,7 @@ import RegisterModal from './Modals/RegisterModal';
 import CreateModal from './Modals/CreateModal';
 
 const Navbar = () => {
-  const [user, setUser] = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(false);
 
   const [isLoginOpen, setLoginOpen] = useState(false);

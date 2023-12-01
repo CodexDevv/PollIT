@@ -1,23 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import Testoasa from '../assets/OBJECTS.png';
 import PollCard from '../components/PollCard';
 import PollCardMultiple from '../components/PollCardMultiple';
+import { PollsContext } from '../App';
 
 const Home = () => {
-  const [polls, setPolls] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchPolls = async () => {
-      const res = await (await fetch('http://localhost:5000/get_polls')).json();
-      setPolls(res);
-      setLoading(false);
-    };
-    fetchPolls();
-  }, []);
-
-  // console.log(polls);
-
-  if (loading) return <div>Loading...</div>;
+  const { polls } = useContext(PollsContext);
 
   return (
     <div className="flex flex-col gap-4 p-2 pt-16 sm:py-4 lg:gap-16 xl:py-4">

@@ -4,7 +4,7 @@ import { UserContext } from '../App';
 
 const PollCardMultiple = ({ data }) => {
   const uuid = () => Math.random().toString(36).slice(-10);
-  const [user] = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const isAuth = user.accesstoken !== '';
 
   const isCreator = user.email === data.creator;
