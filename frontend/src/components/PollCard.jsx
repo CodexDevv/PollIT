@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import { Fragment, useContext } from 'react';
-import { UserContext } from '../App';
+import { PollsContext, UserContext } from '../App';
 import { toast } from 'react-toastify';
 
 const PollCard = ({ data }) => {
   const uuid = () => Math.random().toString(36).slice(-10);
   const { user } = useContext(UserContext);
+  const { fetchPolls } = useContext(PollsContext);
   const isAuth = user.accesstoken !== '';
 
   const isCreator = user.email === data.creator;
@@ -76,6 +77,7 @@ const PollCard = ({ data }) => {
           theme: 'light',
           toastId: 'success-delete',
         });
+        fetchPolls();
       }
     };
     doDelete();
