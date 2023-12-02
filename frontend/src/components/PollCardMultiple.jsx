@@ -78,7 +78,7 @@ const PollCardMultiple = ({ data }) => {
           e.preventDefault();
           voteForPoll();
         }}
-        className="flex h-full flex-col justify-between"
+        className="flex h-full flex-col justify-between gap-8"
       >
         <div className="flex flex-col items-start justify-center gap-4">
           {data.options.map((option, i) => (

@@ -17,6 +17,7 @@ const PollCard = ({ data }) => {
       const checkedOption = document.querySelector(
         `input[name="option${data._id}"]:checked`,
       ).value;
+      console.log(data.options);
       const optionIndex = data.options.indexOf(checkedOption);
       const res = await (
         await fetch('http://localhost:5000/vote_poll', {
@@ -91,7 +92,7 @@ const PollCard = ({ data }) => {
           e.preventDefault();
           voteForPoll();
         }}
-        className="flex h-full flex-col justify-between"
+        className="flex h-full flex-col justify-between gap-8"
       >
         <div className="flex flex-col items-start justify-center gap-4">
           {data.options.map((option, i) => (
