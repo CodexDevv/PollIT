@@ -26,7 +26,7 @@ For **backend**:
 - Express.js
 - Mongoose (MongoDB)
 
-_Basically we used the MERN stack._
+_Basically I used the MERN stack._
 
 ## 🛠️ How to Install Required Packages
 
