@@ -38,6 +38,7 @@ const LoginModal = ({ isLoginOpen, setLoginOpen }) => {
           email: res.email,
         });
         setLoginOpen(false);
+        await fetchPolls();
         toast.success('Logged in!', {
           position: 'bottom-right',
           autoClose: 5000,
@@ -48,7 +49,7 @@ const LoginModal = ({ isLoginOpen, setLoginOpen }) => {
           theme: 'light',
           toastId: 'success-login',
         });
-        fetchPolls();
+
         // window.location.reload();
       } else {
         console.error(res.message);

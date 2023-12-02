@@ -67,6 +67,7 @@ const PollCard = ({ data }) => {
       ).json();
       if (res.error) console.log(res.error);
       else {
+        await fetchPolls();
         toast.info('Deleted!', {
           position: 'bottom-right',
           autoClose: 5000,
@@ -77,7 +78,6 @@ const PollCard = ({ data }) => {
           theme: 'light',
           toastId: 'success-delete',
         });
-        fetchPolls();
       }
     };
     doDelete();

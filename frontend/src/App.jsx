@@ -52,33 +52,23 @@ function App() {
   if (loadingPolls || loadingToken) return <div>Loading...</div>;
 
   return (
-    <PollsContext.Provider value={{ polls, setPolls, fetchPolls }}>
-      <UserContext.Provider value={{ user, setUser }}>
-        <ToastContainer
-          position="bottom-right"
-          autoClose={5000}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-        <div className="flex min-h-[100dvh] flex-col justify-between space-y-4 bg-it bg-cover bg-no-repeat">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="*" element={<Home />} />
-            </Route>
-          </Routes>
-          <Footer />
-        </div>
-        <ToastContainer />
-      </UserContext.Provider>
-    </PollsContext.Provider>
+    <>
+      <ToastContainer />
+      <PollsContext.Provider value={{ polls, setPolls, fetchPolls }}>
+        <UserContext.Provider value={{ user, setUser }}>
+          <div className="flex min-h-[100dvh] flex-col justify-between space-y-4 bg-it bg-cover bg-no-repeat">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="*" element={<Home />} />
+              </Route>
+            </Routes>
+            <Footer />
+          </div>
+        </UserContext.Provider>
+      </PollsContext.Provider>
+    </>
   );
 }
 

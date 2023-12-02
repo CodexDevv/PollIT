@@ -62,6 +62,7 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
       } else {
         setPostOpen(false);
         // window.location.reload();
+        await fetchPolls();
         toast.success('Post created!', {
           position: 'bottom-right',
           autoClose: 5000,
@@ -73,7 +74,6 @@ const CreateModal = ({ isPostOpen, setPostOpen }) => {
           theme: 'light',
           toastId: 'success-create',
         });
-        fetchPolls();
       }
     }
     doCreatePoll();
