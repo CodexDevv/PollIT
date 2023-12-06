@@ -171,12 +171,12 @@ app.post("/vote_poll", async (req, res) => {
       const selectedPoll = await pollCollection.findOne({ _id: o_id });
       if (!selectedPoll) throw new Error("Poll does not exist");
 
-      const optionIndex = selectedPoll.options.indexOf(option);
+      // const optionIndex = selectedPoll.options.indexOf(option);
 
       if (selectedPoll.votes.some((vote) => vote.email === email))
         throw new Error("You already voted");
 
-      const arr = { email: email, option: optionIndex };
+      const arr = { email: email, option: option };
 
       try {
         await pollCollection.findOneAndUpdate(

@@ -17,8 +17,9 @@ const PollCard = ({ data }) => {
       const checkedOption = document.querySelector(
         `input[name="option${data._id}"]:checked`,
       ).value;
-      console.log(data.options);
       const optionIndex = data.options.indexOf(checkedOption);
+
+      console.log(optionIndex);
       const res = await (
         await fetch('http://localhost:5000/vote_poll', {
           method: 'POST',
