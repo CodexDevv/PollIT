@@ -67,6 +67,12 @@ cd backend && nodemon index.js
 
 ### ❗ Don't forget to also start the MongoDB service ❗
 
+## 👨‍🏫 What I have learned during this project
+
+- Creating an Auth System using JWT
+- MongoDB (Previously I have only used Prisma)
+- How to validate input - passwords, emails (although it is only client-sided, I should've added server-side validation using Joi/Zustand)
+
 ## 🤓 Maintainers
 
 <h3 style="display:flex; flex-direction: row; align-items:top; justify-content: start; gap: 1rem;">
